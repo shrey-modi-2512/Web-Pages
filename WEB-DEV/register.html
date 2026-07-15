@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentHub - Register</title>
+</head>
+
+<body>
+
+    
+
+    <header>
+        <h1>StudentHub</h1>
+        <p>Create Your Student Account</p>
+    </header>
+
+    <hr>
+
+    <nav aria-label="Main Navigation">
+        <a href="index.html">Home</a> |
+        <a href="about.html">About</a> |
+        <a href="register.html">Register</a> |
+        <a href="login.html">Login</a> |
+        <a href="dashboard.html">Dashboard</a> |
+        <a href="events.html">Events</a> |
+        <a href="profile.html">Profile</a> |
+        <a href="contact.html">Contact</a> |
+        <a href="admin.html">Admin</a> |
+        <a href="faq.html">FAQ</a>
+    </nav>
+
+    <hr>
+
+    <nav aria-label="Breadcrumb">
+        Home > Register
+    </nav>
+
+    <hr>
+
+    <main id="main">
+
+        <section>
+
+            <h2>Student Registration Form</h2>
+
+            <p>Fill in the details below to create your StudentHub account.</p>
+
+            <form action="#" method="post">
+
+                <label for="fullname">Full Name:</label><br>
+                <input type="text" id="fullname" name="fullname" required><br><br>
+
+                <label for="email">Email Address:</label><br>
+                <input type="email" id="email" name="email" required><br><br>
+
+                <label for="phone">Mobile Number:</label><br>
+                <input type="tel" id="phone" name="phone"><br><br>
+
+                <label for="enrollment">Enrollment Number:</label><br>
+                <input type="text" id="enrollment" name="enrollment"><br><br>
+
+                <label for="department">Department:</label><br>
+                <select id="department" name="department">
+                    <option>Select Department</option>
+                    <option>Computer Engineering</option>
+                    <option>Information Technology</option>
+                    <option>Mechanical Engineering</option>
+                    <option>Civil Engineering</option>
+                    <option>Electrical Engineering</option>
+                </select>
+
+                <br><br>
+
+                <label for="semester">Semester:</label><br>
+                <select id="semester" name="semester">
+                    <option>Select Semester</option>
+                    <option>Semester 1</option>
+                    <option>Semester 2</option>
+                    <option>Semester 3</option>
+                    <option>Semester 4</option>
+                    <option>Semester 5</option>
+                    <option>Semester 6</option>
+                    <option>Semester 7</option>
+                    <option>Semester 8</option>
+                </select>
+
+                <br><br>
+
+                <label>Gender:</label><br>
+
+                <input type="radio" id="male" name="gender">
+                <label for="male">Male</label>
+
+                <input type="radio" id="female" name="gender">
+                <label for="female">Female</label>
+
+                <input type="radio" id="other" name="gender">
+                <label for="other">Other</label>
+
+                <br><br>
+
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password" required><br><br>
+
+                <label for="confirm">Confirm Password:</label><br>
+                <input type="password" id="confirm" name="confirm" required><br><br>
+
+                <input type="checkbox" id="terms" required>
+                <label for="terms">I agree to the Terms and Conditions.</label>
+
+                <br><br>
+
+                <input type="submit" value="Register">
+                <input type="reset" value="Reset">
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <hr>
+
+    <aside>
+
+        <h2>Registration Guidelines</h2>
+
+        <ul>
+            <li>Use a valid email address.</li>
+            <li>Create a strong password.</li>
+            <li>Fill all required fields.</li>
+            <li>Keep your login details secure.</li>
+        </ul>
+
+    </aside>
+
+</body>
+
+</html>
