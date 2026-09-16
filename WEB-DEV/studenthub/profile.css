@@ -1,0 +1,127 @@
+/* Profile page styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f5f7fb;
+    color: #222;
+}
+
+header {
+    background: #1b2240;
+    color: white;
+    text-align: center;
+    padding: 22px 20px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+nav {
+    background: white;
+    text-align: center;
+    padding: 12px;
+}
+
+nav a {
+    color: #1b2240;
+    text-decoration: none;
+    margin: 0 6px;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: #20b15a;
+}
+
+main {
+    max-width: 650px;
+    margin: 25px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+main h2 {
+    color: #1b2240;
+    margin-bottom: 15px;
+}
+
+main img {
+    border-radius: 50%;
+    border: 3px solid #20b15a;
+    display: block;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+main section p {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+#editBtn {
+    margin-top: 10px;
+    background: #1b2240;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#editBtn:hover {
+    background: #29325e;
+}
+
+aside {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 15px 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+.progress-bar {
+    width: 100%;
+    background: #eee;
+    border-radius: 20px;
+    height: 12px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #20b15a;
+    border-radius: 20px;
+    transition: width 1s ease-in-out;
+}
+
+.A {
+    max-width: 650px;
+    margin: 20px auto 30px !important;
+    background: #e9fff1 !important;
+    border-radius: 8px;
+}
+
+.A h3 {
+    color: #1a7d40;
+    margin-bottom: 8px;
+}
+
+.A p {
+    font-size: 14px;
+    margin-bottom: 5px;
+}

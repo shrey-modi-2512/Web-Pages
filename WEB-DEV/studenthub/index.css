@@ -1,0 +1,14 @@
+*{
+    background-color:white;
+
+}
+
+.hero{
+    color: black;
+    
+
+}
+header{
+    font-size: large;
+    display: grid;
+}

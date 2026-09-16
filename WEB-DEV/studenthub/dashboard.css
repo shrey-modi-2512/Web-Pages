@@ -1,0 +1,130 @@
+/* Dashboard page styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f5f7fb;
+    color: #222;
+}
+
+header {
+    background: #1b2240;
+    color: white;
+    text-align: center;
+    padding: 22px 20px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+nav {
+    background: white;
+    text-align: center;
+    padding: 12px;
+}
+
+nav a {
+    color: #1b2240;
+    text-decoration: none;
+    margin: 0 6px;
+    font-size: 14px;
+}
+
+nav a:hover {
+    color: #20b15a;
+}
+
+main {
+    max-width: 800px;
+    margin: 25px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+main section:first-child {
+    grid-column: 1 / -1;
+}
+
+main section {
+    background: white;
+    padding: 18px 22px;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+main h2 {
+    color: #1b2240;
+}
+
+main h3 {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+main p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #20b15a;
+}
+
+/* attendance progress bar, filled in by dashboard.js */
+.progress-bar {
+    width: 100%;
+    background: #eee;
+    border-radius: 20px;
+    height: 12px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #20b15a;
+    border-radius: 20px;
+    transition: width 1s ease-in-out;
+}
+
+aside {
+    max-width: 800px;
+    margin: 0 auto 30px;
+    padding: 18px 22px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+}
+
+aside h3 {
+    color: #1b2240;
+    margin-bottom: 10px;
+}
+
+aside ul {
+    list-style: none;
+}
+
+aside li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+aside li:hover {
+    color: #20b15a;
+}
+
+@media (max-width: 600px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+}
