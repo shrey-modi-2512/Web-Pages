@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mark Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="title-block">
+    <div>
+      <h1>Mark Register</h1>
+      <div class="subtitle">Search by name, sort by percentage</div>
+    </div>
+    <div class="tally">
+      <strong id="countTally">0</strong>
+      students listed
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Search a student's name…" autocomplete="off">
+    </div>
+    <div class="sort-group">
+      <button class="sort-btn" data-sort="name">Name <span class="arrow"></span></button>
+      <button class="sort-btn" data-sort="percentage">Percentage <span class="arrow"></span></button>
+    </div>
+    <button class="add-btn" id="toggleAdd">+ Add student</button>
+  </div>
+
+  <div class="add-panel" id="addPanel">
+    <div class="field">
+      <label for="newName">Student name</label>
+      <input id="newName" type="text" placeholder="e.g. Shrey Modi">
+    </div>
+    <div class="field">
+      <label for="newPct">Percentage</label>
+      <input id="newPct" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+    <button class="save-btn" id="saveBtn">Add to register</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th class="num">Percentage</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="empty-state" id="emptyState" style="display:none;">No students match your search.</div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

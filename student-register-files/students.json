@@ -1,0 +1,10 @@
+[
+  { "id": "s1", "name": "Priya Sharma", "percentage": 92.5 },
+  { "id": "s2", "name": "Arjun Mehta", "percentage": 78.2 },
+  { "id": "s3", "name": "Fatima Sheikh", "percentage": 88.0 },
+  { "id": "s4", "name": "Rohan Desai", "percentage": 61.4 },
+  { "id": "s5", "name": "Ananya Iyer", "percentage": 95.8 },
+  { "id": "s6", "name": "Karan Patel", "percentage": 45.9 },
+  { "id": "s7", "name": "Sneha Reddy", "percentage": 71.3 },
+  { "id": "s8", "name": "Vikram Nair", "percentage": 33.6 }
+]
