@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentHub - Data Explorer</title>
+    <link rel="stylesheet" href="register.css">
+    <link rel="stylesheet" href="explorer.css">
+</head>
+<body>
+    <header><h1>StudentHub</h1><p>Events, Students and FAQs from JSON</p></header>
+    <nav aria-label="Main Navigation">
+        <a href="index.html">Home</a> | <a href="register.html">Register</a> |
+        <a href="explorer.html" aria-current="page">Explorer</a> | <a href="records.php">Records</a>
+    </nav>
+    <main id="main" class="wide">
+        <section>
+            <div id="tabs" role="group" aria-label="Dataset">
+                <button type="button" data-type="events" aria-pressed="true">Events</button>
+                <button type="button" data-type="students" aria-pressed="false">Students</button>
+                <button type="button" data-type="faqs" aria-pressed="false">FAQs</button>
+            </div>
+            <div class="toolbar">
+                <label>Search <input type="text" id="q" placeholder="Type to search..."></label>
+                <label>Filter <select id="filter"></select></label>
+                <label>Sort by <select id="sort"></select></label>
+                <label>Order <select id="dir"><option value="asc">Ascending</option><option value="desc">Descending</option></select></label>
+                <label>Per page <select id="size"><option>3</option><option selected>6</option><option>9</option></select></label>
+            </div>
+            <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+            <p id="count" class="count"></p>
+            <div id="list" class="grid"></div>
+            <div id="pager" class="pager"></div>
+        </section>
+    </main>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

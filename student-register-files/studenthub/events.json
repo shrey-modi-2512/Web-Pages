@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "title": "Hackathon 2026",
+    "category": "Technical",
+    "date": "2026-11-05",
+    "venue": "Main Lab",
+    "seats": 120
+  },
+  {
+    "id": 2,
+    "title": "Coding Contest",
+    "category": "Technical",
+    "date": "2026-11-12",
+    "venue": "Lab 2",
+    "seats": 80
+  },
+  {
+    "id": 3,
+    "title": "Annual Dance Night",
+    "category": "Cultural",
+    "date": "2026-11-20",
+    "venue": "Auditorium",
+    "seats": 300
+  },
+  {
+    "id": 4,
+    "title": "Cricket Tournament",
+    "category": "Sports",
+    "date": "2026-11-22",
+    "venue": "Ground",
+    "seats": 150
+  },
+  {
+    "id": 5,
+    "title": "Web Dev Workshop",
+    "category": "Workshop",
+    "date": "2026-11-08",
+    "venue": "Seminar Hall",
+    "seats": 60
+  },
+  {
+    "id": 6,
+    "title": "Robotics Expo",
+    "category": "Technical",
+    "date": "2026-12-02",
+    "venue": "Block B",
+    "seats": 200
+  },
+  {
+    "id": 7,
+    "title": "Music Fest",
+    "category": "Cultural",
+    "date": "2026-12-10",
+    "venue": "Open Theatre",
+    "seats": 500
+  },
+  {
+    "id": 8,
+    "title": "Football League",
+    "category": "Sports",
+    "date": "2026-12-14",
+    "venue": "Ground",
+    "seats": 100
+  },
+  {
+    "id": 9,
+    "title": "AI Bootcamp",
+    "category": "Workshop",
+    "date": "2026-11-28",
+    "venue": "Lab 1",
+    "seats": 50
+  },
+  {
+    "id": 10,
+    "title": "Poetry Evening",
+    "category": "Cultural",
+    "date": "2026-11-15",
+    "venue": "Library Hall",
+    "seats": 70
+  },
+  {
+    "id": 11,
+    "title": "Badminton Cup",
+    "category": "Sports",
+    "date": "2026-12-05",
+    "venue": "Indoor Court",
+    "seats": 64
+  },
+  {
+    "id": 12,
+    "title": "Cyber Security CTF",
+    "category": "Technical",
+    "date": "2026-12-18",
+    "venue": "Lab 3",
+    "seats": 90
+  },
+  {
+    "id": 13,
+    "title": "Resume Building Session",
+    "category": "Workshop",
+    "date": "2026-11-10",
+    "venue": "Seminar Hall",
+    "seats": 100
+  },
+  {
+    "id": 14,
+    "title": "Art Exhibition",
+    "category": "Cultural",
+    "date": "2026-12-20",
+    "venue": "Gallery",
+    "seats": 250
+  },
+  {
+    "id": 15,
+    "title": "Chess Championship",
+    "category": "Sports",
+    "date": "2026-12-08",
+    "venue": "Room 12",
+    "seats": 48
+  }
+]

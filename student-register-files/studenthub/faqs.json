@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "question": "How do I register?",
+    "answer": "Open the Register page, fill the form and press Register.",
+    "category": "Account"
+  },
+  {
+    "id": 2,
+    "question": "I forgot my password. What now?",
+    "answer": "Use the Forgot Password link on the Login page.",
+    "category": "Account"
+  },
+  {
+    "id": 3,
+    "question": "Can I change my email?",
+    "answer": "Yes, from Profile > Edit details.",
+    "category": "Account"
+  },
+  {
+    "id": 4,
+    "question": "Who can create events?",
+    "answer": "Only admins and approved club coordinators.",
+    "category": "Events"
+  },
+  {
+    "id": 5,
+    "question": "How do I join an event?",
+    "answer": "Open Events and click Register on the event card.",
+    "category": "Events"
+  },
+  {
+    "id": 6,
+    "question": "Is there a fee for events?",
+    "answer": "Most events are free; paid ones show the fee on the card.",
+    "category": "Events"
+  },
+  {
+    "id": 7,
+    "question": "Can I cancel my event registration?",
+    "answer": "Yes, up to 24 hours before the event starts.",
+    "category": "Events"
+  },
+  {
+    "id": 8,
+    "question": "Where do I see notices?",
+    "answer": "On the Dashboard under Latest Notices.",
+    "category": "Notices"
+  },
+  {
+    "id": 9,
+    "question": "How often are notices updated?",
+    "answer": "Notices are posted by admins as needed, usually daily.",
+    "category": "Notices"
+  },
+  {
+    "id": 10,
+    "question": "Can I download notices?",
+    "answer": "Yes, attached PDFs have a download link.",
+    "category": "Notices"
+  },
+  {
+    "id": 11,
+    "question": "Which browsers are supported?",
+    "answer": "Latest Chrome, Firefox, Edge and Safari.",
+    "category": "Technical"
+  },
+  {
+    "id": 12,
+    "question": "Why does the page not load data?",
+    "answer": "Open the site through a web server (XAMPP), not by double-clicking the file.",
+    "category": "Technical"
+  },
+  {
+    "id": 13,
+    "question": "Is my data safe?",
+    "answer": "Inputs are sanitized on the server and forms use CSRF tokens.",
+    "category": "Technical"
+  },
+  {
+    "id": 14,
+    "question": "Who do I contact for help?",
+    "answer": "Use the Contact page or email support@studenthub.edu.",
+    "category": "Account"
+  },
+  {
+    "id": 15,
+    "question": "Can I use the site on mobile?",
+    "answer": "Yes, the layout is responsive.",
+    "category": "Technical"
+  }
+]

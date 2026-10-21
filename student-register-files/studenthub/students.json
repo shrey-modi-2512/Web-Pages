@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "Riya Patel",
+    "department": "Computer Engineering",
+    "year": 3,
+    "cgpa": 8.9,
+    "email": "riya.patel@college.edu"
+  },
+  {
+    "id": 2,
+    "name": "Aman Shah",
+    "department": "Information Technology",
+    "year": 2,
+    "cgpa": 8.2,
+    "email": "aman.shah@college.edu"
+  },
+  {
+    "id": 3,
+    "name": "Neha Joshi",
+    "department": "Civil Engineering",
+    "year": 4,
+    "cgpa": 7.6,
+    "email": "neha.joshi@college.edu"
+  },
+  {
+    "id": 4,
+    "name": "Karan Mehta",
+    "department": "Mechanical Engineering",
+    "year": 1,
+    "cgpa": 7.1,
+    "email": "karan.mehta@college.edu"
+  },
+  {
+    "id": 5,
+    "name": "Priya Desai",
+    "department": "Electrical Engineering",
+    "year": 3,
+    "cgpa": 8.5,
+    "email": "priya.desai@college.edu"
+  },
+  {
+    "id": 6,
+    "name": "Rohit Verma",
+    "department": "Computer Engineering",
+    "year": 2,
+    "cgpa": 9.1,
+    "email": "rohit.verma@college.edu"
+  },
+  {
+    "id": 7,
+    "name": "Sneha Rao",
+    "department": "Information Technology",
+    "year": 4,
+    "cgpa": 8.0,
+    "email": "sneha.rao@college.edu"
+  },
+  {
+    "id": 8,
+    "name": "Dev Parekh",
+    "department": "Mechanical Engineering",
+    "year": 3,
+    "cgpa": 6.9,
+    "email": "dev.parekh@college.edu"
+  },
+  {
+    "id": 9,
+    "name": "Isha Trivedi",
+    "department": "Civil Engineering",
+    "year": 1,
+    "cgpa": 7.8,
+    "email": "isha.trivedi@college.edu"
+  },
+  {
+    "id": 10,
+    "name": "Harsh Modi",
+    "department": "Electrical Engineering",
+    "year": 2,
+    "cgpa": 8.3,
+    "email": "harsh.modi@college.edu"
+  },
+  {
+    "id": 11,
+    "name": "Meera Nair",
+    "department": "Computer Engineering",
+    "year": 4,
+    "cgpa": 9.4,
+    "email": "meera.nair@college.edu"
+  },
+  {
+    "id": 12,
+    "name": "Vikram Singh",
+    "department": "Information Technology",
+    "year": 1,
+    "cgpa": 7.4,
+    "email": "vikram.singh@college.edu"
+  },
+  {
+    "id": 13,
+    "name": "Anjali Gupta",
+    "department": "Civil Engineering",
+    "year": 2,
+    "cgpa": 8.7,
+    "email": "anjali.gupta@college.edu"
+  },
+  {
+    "id": 14,
+    "name": "Yash Thakkar",
+    "department": "Mechanical Engineering",
+    "year": 4,
+    "cgpa": 7.2,
+    "email": "yash.thakkar@college.edu"
+  },
+  {
+    "id": 15,
+    "name": "Pooja Bhatt",
+    "department": "Electrical Engineering",
+    "year": 3,
+    "cgpa": 8.1,
+    "email": "pooja.bhatt@college.edu"
+  }
+]

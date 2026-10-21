@@ -1,0 +1,17 @@
+main.wide { max-width: 1000px; }
+#tabs button, .pager button { border: 1px solid #ccc; background: #eee; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 6px; }
+#tabs button[aria-pressed="true"], .pager button.cur { background: #1b2240; color: #fff; border-color: #1b2240; }
+.pager button:disabled { opacity: .5; cursor: not-allowed; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.toolbar label { flex: 1 1 150px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.card { border: 1px solid #e1e5ee; border-radius: 8px; padding: 14px; background: #fafbff; font-size: 14px; }
+.card h3 { color: #1b2240; margin: 8px 0; font-size: 16px; }
+.card p { margin-bottom: 4px; color: #444; }
+.tag { background: #e9fff1; color: #1a7d40; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+.pager { margin-top: 18px; text-align: center; }
+.count { font-size: 13px; color: #666; }
+.empty { grid-column: 1 / -1; color: #666; }
+.status { padding: 10px 14px; border-radius: 6px; font-size: 14px; margin-bottom: 10px; }
+.status.loading { background: #eef1f8; } .status.error { background: #fff0f0; color: #a22; border: 1px solid #d33; }
+.status.info { background: #fff8e1; color: #7a5b00; }
