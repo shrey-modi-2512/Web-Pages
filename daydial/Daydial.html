@@ -1,0 +1,866 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Daydial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a sticky sidebar holds a 24-hour dial (today's tasks as dots on a clock face) and the dashboard; the main column holds the task form and the grouped list. */
+:root{
+  --bg:#E8ECF1; --surface:#F6F8FA; --surface-2:#D9E0E9; --ink:#121C2B; --muted:#566478; --line:#C3CCD8;
+  --accent:#2B45F0; --accent-ink:#FFFFFF;
+  --hi:#D3314A; --med:#A86A00; --lo:#0B8575; --ok:#2E8B57;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C121B; --surface:#151E2B; --surface-2:#1F2A3A; --ink:#E6ECF5; --muted:#93A1B5; --line:#2A3748;
+    --accent:#8FA2FF; --accent-ink:#0C121B;
+    --hi:#FF6B7D; --med:#F2B33D; --lo:#3FD0BB; --ok:#5CC98A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C121B; --surface:#151E2B; --surface-2:#1F2A3A; --ink:#E6ECF5; --muted:#93A1B5; --line:#2A3748;
+  --accent:#8FA2FF; --accent-ink:#0C121B;
+  --hi:#FF6B7D; --med:#F2B33D; --lo:#3FD0BB; --ok:#5CC98A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-block:24px 64px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+h1,h2,h3,p{margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.app{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.brand{display:flex;flex-direction:column;gap:6px;min-width:0}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.1rem,6vw,3rem);line-height:.95;letter-spacing:-.03em}
+.brand p{color:var(--muted);font-size:14px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:7px;font:500 12px/1 var(--mono);padding:8px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--surface)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.pill.off::before{background:var(--med)}
+
+.btn{border:1px solid transparent;border-radius:8px;padding:10px 16px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--muted);filter:none}
+.btn.sm{padding:7px 11px;font-size:13px;font-weight:500}
+
+.samplebar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:10px 14px;border:1px dashed var(--muted);border-radius:10px;color:var(--muted);font-size:14px}
+.samplebar p{min-width:0}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+.side,.main{display:flex;flex-direction:column;gap:20px;min-width:0}
+@media (min-width:900px){
+  .grid{grid-template-columns:360px minmax(0,1fr);align-items:start}
+  .side{position:sticky;top:16px}
+}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.cardhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h2{font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:-.01em}
+.cardhead .mono{color:var(--muted);font-size:12px}
+
+/* dial */
+.dialcard{border-radius:22px}
+#dial{width:100%;max-width:340px;height:auto;margin:0 auto;display:block;overflow:visible}
+.d-track{fill:none;stroke:var(--surface-2);stroke-width:16}
+.d-elapsed{fill:none;stroke:var(--accent);stroke-width:16;opacity:.22}
+.d-win{fill:none;stroke-width:16;opacity:.5}
+.d-tick{stroke:var(--muted);stroke-width:1}
+.d-tick.major{stroke:var(--ink);stroke-width:1.5}
+.d-lbl{font:500 11px var(--mono);fill:var(--muted);text-anchor:middle}
+.d-needle{stroke:var(--ink);stroke-width:2.5;stroke-linecap:round}
+.d-needle-dot{fill:var(--ink)}
+.d-dot{cursor:pointer}
+.d-dot .hit{fill:transparent}
+.d-dot:focus-visible{outline:none}
+.d-dot:focus-visible .ring{stroke:var(--accent);stroke-width:3}
+.d-dot .ring{fill:none;stroke:transparent;stroke-width:3}
+.d-k{font:500 10px var(--mono);letter-spacing:.14em;fill:var(--muted);text-anchor:middle}
+.d-t{font:700 17px var(--display);fill:var(--ink);text-anchor:middle;letter-spacing:-.01em}
+.d-r{font:500 13px var(--mono);fill:var(--accent);text-anchor:middle}
+.d-s{font:400 11px var(--mono);fill:var(--muted);text-anchor:middle}
+.hint{color:var(--muted);font-size:13px}
+
+/* dashboard */
+.dash{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.ringwrap{position:relative;width:88px;height:88px}
+.ringwrap svg{width:88px;height:88px;transform:rotate(-90deg)}
+.ringwrap .bg{fill:none;stroke:var(--surface-2);stroke-width:9}
+.ringwrap .fg{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.ringwrap b{position:absolute;inset:0;display:grid;place-items:center;font:500 16px var(--mono)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;min-width:0}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font:500 22px/1 var(--mono)}
+.stat span{font-size:12px;color:var(--muted)}
+.stat.warn b{color:var(--hi)}
+.split{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--surface-2);gap:2px}
+.split i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:6px}
+
+/* form */
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+.lbl{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field input[type=text],.field input[type=datetime-local],.field input[type=search],.field select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);min-width:0
+}
+.field input::placeholder{color:var(--muted)}
+.seg{display:flex;gap:6px}
+.seg label{position:relative;flex:1;min-width:0}
+.seg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.seg span{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 4px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:var(--bg)}
+.seg input:checked+span{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--bg));font-weight:600}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.seg.pri span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.formfoot{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ferr{color:var(--hi);font-size:13px;min-height:1.2em}
+@media (max-width:560px){.formgrid{grid-template-columns:minmax(0,1fr)}}
+
+/* list */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-size:13px;display:inline-flex;gap:7px;align-items:center}
+.chip b{font:500 12px var(--mono);color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"] b{color:var(--bg);opacity:.75}
+.search{flex:1 1 160px;max-width:240px;min-width:0}
+.search input{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:14px}
+.group h3{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:6px;display:flex;gap:8px}
+.group.overdue h3{color:var(--hi)}
+.tasks{list-style:none;margin:0;padding:0}
+.task{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:12px 8px;border-top:1px solid var(--line);border-radius:6px}
+.task.is-flash{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--p);background:transparent;display:grid;place-items:center;padding:0;margin-top:1px;color:var(--bg)}
+.check:hover{background:color-mix(in srgb,var(--p) 20%,transparent)}
+.check svg{opacity:0}
+.is-done .check{background:var(--p)}
+.is-done .check svg{opacity:1}
+.tbody{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ttitle{font-weight:500;overflow-wrap:anywhere}
+.is-done .ttitle{text-decoration:line-through;color:var(--muted)}
+.tmeta{display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center;font-size:13px;color:var(--muted)}
+.tmeta .when,.tmeta .rel{font-family:var(--mono);font-size:12px}
+.is-overdue .when,.is-overdue .rel{color:var(--hi)}
+.tag{font:500 11px/1 var(--mono);padding:4px 6px;border:1px solid var(--line);border-radius:4px;color:var(--muted);white-space:nowrap}
+.tag.pri{color:var(--p);border-color:color-mix(in srgb,var(--p) 45%,var(--line))}
+.tact{display:flex;gap:4px}
+.link{background:none;border:0;padding:4px 8px;border-radius:6px;font-size:13px;color:var(--muted)}
+.link:hover{color:var(--ink);background:var(--surface-2)}
+.link.danger:hover,.link.danger.sure{color:var(--hi)}
+.link.danger.sure{font-weight:600}
+.empty{padding:24px 8px;color:var(--muted);text-align:center;border-top:1px solid var(--line)}
+@media (max-width:520px){
+  .task{grid-template-columns:auto minmax(0,1fr)}
+  .tact{grid-column:2}
+}
+.foot{color:var(--muted);font-size:13px;max-width:70ch}
+
+/* toasts */
+.toasts{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));right:max(16px,env(safe-area-inset-right,0px));width:min(360px,calc(100vw - 32px));display:flex;flex-direction:column;gap:10px;z-index:20}
+.toast{background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.toast .tt{font:700 15px var(--display)}
+.toast .tm{font-size:13px;opacity:.85;overflow-wrap:anywhere}
+.toast .ta{display:flex;gap:8px;margin-top:6px}
+.toast .ta button{background:transparent;border:1px solid color-mix(in srgb,var(--bg) 40%,transparent);color:var(--bg);border-radius:6px;padding:5px 10px;font-size:13px}
+.toast .ta button:hover{background:color-mix(in srgb,var(--bg) 18%,transparent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Daydial</h1>
+      <p>Your tasks on a 24-hour face</p>
+    </div>
+    <div class="tools">
+      <span class="pill" id="net">Online</span>
+      <button type="button" class="btn ghost sm" id="alerts" hidden></button>
+      <button type="button" class="btn ghost sm" id="theme"></button>
+    </div>
+  </header>
+
+  <div class="samplebar" id="samplebar" hidden>
+    <p>Sample tasks are loaded so you can see how everything works.</p>
+    <button type="button" class="btn ghost sm" id="clearsamples">Clear samples</button>
+  </div>
+
+  <div class="grid">
+    <aside class="side">
+      <section class="card dialcard" aria-labelledby="dial-h">
+        <div class="cardhead">
+          <h2 id="dial-h">Today</h2>
+          <span class="mono" id="clock"></span>
+        </div>
+        <svg id="dial" viewBox="0 0 340 340" role="img" aria-label="Today's tasks on a 24-hour dial"></svg>
+        <p class="hint">Midnight sits at the top. Each dot is a due time today, and the shaded arc before it is its reminder window.</p>
+      </section>
+
+      <section class="card" aria-labelledby="dash-h">
+        <h2 id="dash-h">Dashboard</h2>
+        <div class="dash">
+          <div class="ringwrap">
+            <svg viewBox="0 0 88 88" aria-hidden="true">
+              <circle class="bg" cx="44" cy="44" r="36"/>
+              <circle class="fg" id="ring" cx="44" cy="44" r="36"/>
+            </svg>
+            <b id="rate">0%</b>
+          </div>
+          <div class="stats">
+            <div class="stat"><b id="s-done">0</b><span>Completed</span></div>
+            <div class="stat"><b id="s-pending">0</b><span>Pending</span></div>
+            <div class="stat"><b id="s-today">0</b><span>Due today</span></div>
+            <div class="stat" id="s-over-wrap"><b id="s-over">0</b><span>Overdue</span></div>
+          </div>
+        </div>
+        <div class="split" id="split" aria-hidden="true"></div>
+        <div class="legend" id="legend"></div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <form class="card" id="taskform" novalidate>
+        <div class="cardhead">
+          <h2 id="formtitle">New task</h2>
+        </div>
+        <div class="formgrid">
+          <div class="field full">
+            <label class="lbl" for="f-title">Task</label>
+            <input type="text" id="f-title" maxlength="140" placeholder="What needs doing?" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="lbl" for="f-due">Due</label>
+            <input type="datetime-local" id="f-due">
+          </div>
+          <div class="field">
+            <label class="lbl" for="f-repeat">Repeat</label>
+            <select id="f-repeat">
+              <option value="none">Does not repeat</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div class="field" role="radiogroup" aria-labelledby="lp">
+            <span class="lbl" id="lp">Priority</span>
+            <div class="seg pri">
+              <label><input type="radio" name="pri" value="high"><span style="--c:var(--hi)">High</span></label>
+              <label><input type="radio" name="pri" value="med" checked><span style="--c:var(--med)">Medium</span></label>
+              <label><input type="radio" name="pri" value="low"><span style="--c:var(--lo)">Low</span></label>
+            </div>
+          </div>
+          <div class="field" role="radiogroup" aria-labelledby="lr">
+            <span class="lbl" id="lr">Remind me before</span>
+            <div class="seg">
+              <label><input type="radio" name="lead" value="5"><span>5 min</span></label>
+              <label><input type="radio" name="lead" value="15"><span>15 min</span></label>
+              <label><input type="radio" name="lead" value="30"><span>30 min</span></label>
+              <label><input type="radio" name="lead" value="60" checked><span>1 hour</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="formfoot">
+          <button type="submit" class="btn" id="f-submit">Add task</button>
+          <button type="button" class="btn ghost" id="f-cancel" hidden>Cancel</button>
+          <span class="ferr" id="ferr" role="alert"></span>
+        </div>
+      </form>
+
+      <section class="card" aria-labelledby="list-h">
+        <div class="cardhead"><h2 id="list-h">Tasks</h2></div>
+        <div class="toolbar">
+          <div class="chips" id="chips">
+            <button type="button" class="chip" data-f="all" aria-pressed="true">All <b id="c-all">0</b></button>
+            <button type="button" class="chip" data-f="pending" aria-pressed="false">Pending <b id="c-pending">0</b></button>
+            <button type="button" class="chip" data-f="overdue" aria-pressed="false">Overdue <b id="c-overdue">0</b></button>
+            <button type="button" class="chip" data-f="done" aria-pressed="false">Done <b id="c-done">0</b></button>
+          </div>
+          <div class="search"><input type="search" id="q" placeholder="Search tasks" aria-label="Search tasks"></div>
+        </div>
+        <div id="list"></div>
+      </section>
+    </main>
+  </div>
+
+  <p class="foot">Tasks are saved in this browser. Reminders fire while this page is open, and once it has loaded it keeps working without a connection.</p>
+</div>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'daydial.v1', THEME = 'daydial.theme';
+  var MIN = 60000, DAY = 86400000, C = 170, RING_R = 122;
+  var PRI = {
+    high: { label: 'High', v: '--hi' },
+    med: { label: 'Medium', v: '--med' },
+    low: { label: 'Low', v: '--lo' }
+  };
+  var state = { tasks: [], filter: 'all', q: '', editing: null, flash: null, confirmDel: null, sig: '' };
+  var mem = {};
+  var actx = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- storage ---------- */
+  function store(k, v) { try { localStorage.setItem(k, v); } catch (e) { mem[k] = v; } }
+  function read(k) {
+    try { var v = localStorage.getItem(k); return v === null ? (mem[k] || null) : v; }
+    catch (e) { return mem[k] || null; }
+  }
+  function save() { store(KEY, JSON.stringify({ tasks: state.tasks })); }
+  function load() {
+    var raw = read(KEY);
+    if (!raw) return false;
+    try {
+      var d = JSON.parse(raw);
+      if (d && Array.isArray(d.tasks)) { state.tasks = d.tasks; return true; }
+    } catch (e) {}
+    return false;
+  }
+
+  /* ---------- helpers ---------- */
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function mk(o) {
+    return Object.assign({
+      id: uid(), title: '', due: Date.now(), pri: 'med', lead: 60, repeat: 'none',
+      done: false, doneAt: null, notified: false, nextId: null, sample: false
+    }, o);
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function find(id) { return state.tasks.filter(function (t) { return t.id === id; })[0]; }
+  function dayStart(ts) { var d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function toLocal(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function defaultDue() { var d = new Date(); d.setMinutes(0, 0, 0); d.setHours(d.getHours() + 1); return d.getTime(); }
+  var fmtTime = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+  function dueLabel(ts) {
+    var now = Date.now();
+    var diff = Math.round((dayStart(ts) - dayStart(now)) / DAY);
+    var time = fmtTime.format(ts);
+    if (diff === 0) return 'Today, ' + time;
+    if (diff === 1) return 'Tomorrow, ' + time;
+    if (diff === -1) return 'Yesterday, ' + time;
+    var o = { weekday: 'short', day: 'numeric', month: 'short' };
+    if (new Date(ts).getFullYear() !== new Date(now).getFullYear()) o.year = 'numeric';
+    return new Intl.DateTimeFormat(undefined, o).format(ts) + ', ' + time;
+  }
+  function span(abs) {
+    var m = Math.round(abs / MIN);
+    if (m < 1) return null;
+    if (m < 60) return m + ' min';
+    if (m < 48 * 60) { var h = Math.floor(m / 60), mm = m % 60; return h + ' h' + (mm ? ' ' + mm + ' min' : ''); }
+    return Math.round(abs / DAY) + ' days';
+  }
+  function rel(ts) {
+    var diff = ts - Date.now();
+    var s = span(Math.abs(diff));
+    if (!s) return 'now';
+    return diff > 0 ? 'in ' + s : s + ' ago';
+  }
+  function leadLabel(l) { return l === 60 ? '1 h before' : l + ' min before'; }
+  function nextDue(ts, repeat) {
+    var d = new Date(ts);
+    if (repeat === 'daily') d.setDate(d.getDate() + 1);
+    else if (repeat === 'weekly') d.setDate(d.getDate() + 7);
+    else if (repeat === 'monthly') {
+      var day = d.getDate();
+      d.setDate(1);
+      d.setMonth(d.getMonth() + 1);
+      var last = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      d.setDate(Math.min(day, last));
+    }
+    return d.getTime();
+  }
+
+  /* ---------- seed ---------- */
+  function seed() {
+    var now = Date.now();
+    function at(off, h, m) { var d = new Date(now); d.setDate(d.getDate() + off); d.setHours(h, m, 0, 0); return d.getTime(); }
+    function soon(h, m) { var t = at(0, h, m); return t < now + 45 * MIN ? at(1, h, m) : t; }
+    var list = [
+      { title: 'Submit lab journal', due: soon(17, 0), pri: 'high', lead: 30 },
+      { title: 'Buy groceries', due: soon(18, 15), pri: 'low', lead: 15 },
+      { title: 'Evening walk', due: soon(20, 0), pri: 'low', lead: 15, repeat: 'daily' },
+      { title: 'Revise unit 3 notes', due: at(1, 9, 30), pri: 'med', lead: 60 },
+      { title: 'Weekly planning', due: at(2, 11, 0), pri: 'med', lead: 30, repeat: 'weekly' },
+      { title: 'Pay hostel fees', due: at(3, 12, 0), pri: 'high', lead: 60 },
+      { title: 'Read one chapter', due: at(0, 9, 0), pri: 'low', lead: 15, done: true, doneAt: now - 3 * 3600000 }
+    ];
+    state.tasks = list.map(function (o) {
+      var t = mk(Object.assign({ sample: true }, o));
+      if (t.done || t.due - t.lead * MIN <= now) t.notified = true;
+      return t;
+    });
+    save();
+  }
+
+  /* ---------- theme ---------- */
+  function effTheme() {
+    var a = document.documentElement.getAttribute('data-theme');
+    if (a) return a;
+    return window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function themeLabel() {
+    var dark = effTheme() === 'dark';
+    $('theme').textContent = dark ? 'Light mode' : 'Dark mode';
+    $('theme').setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+
+  /* ---------- audio, toasts, notifications ---------- */
+  function ensureAudio() {
+    if (actx) return;
+    try { var A = window.AudioContext || window.webkitAudioContext; if (A) actx = new A(); } catch (e) {}
+  }
+  function beep() {
+    try {
+      if (!actx) return;
+      if (actx.state === 'suspended') actx.resume();
+      var t0 = actx.currentTime;
+      [880, 1175].forEach(function (f, i) {
+        var o = actx.createOscillator(), g = actx.createGain(), s = t0 + i * 0.16;
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, s);
+        g.gain.exponentialRampToValueAtTime(0.18, s + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, s + 0.14);
+        o.connect(g); g.connect(actx.destination);
+        o.start(s); o.stop(s + 0.16);
+      });
+    } catch (e) {}
+  }
+  function toast(o) {
+    var box = $('toasts');
+    var el = document.createElement('div');
+    el.className = 'toast';
+    if (o.task) el.dataset.task = o.task;
+    var h = document.createElement('p'); h.className = 'tt'; h.textContent = o.title;
+    var m = document.createElement('p'); m.className = 'tm'; m.textContent = o.msg || '';
+    el.appendChild(h); el.appendChild(m);
+    if (o.actions) {
+      var row = document.createElement('div'); row.className = 'ta';
+      o.actions.forEach(function (a) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = a.label; b.dataset.tact = a.id;
+        row.appendChild(b);
+      });
+      el.appendChild(row);
+    }
+    box.appendChild(el);
+    while (box.children.length > 4) box.removeChild(box.firstChild);
+    if (!o.sticky) setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, o.ms || 3000);
+  }
+  function systemNotify(t, body) {
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Daydial: ' + t.title, { body: body });
+      }
+    } catch (e) {}
+  }
+  function alertsLabel() {
+    var b = $('alerts');
+    if (!('Notification' in window)) { b.hidden = true; return; }
+    b.hidden = false;
+    var p = Notification.permission;
+    b.textContent = p === 'granted' ? 'System alerts on' : p === 'denied' ? 'System alerts blocked' : 'Turn on system alerts';
+    b.disabled = p !== 'default';
+  }
+  function remind(t) {
+    var now = Date.now();
+    var body = (t.due > now ? 'Due ' : 'Was due ') + rel(t.due) + ' · ' + dueLabel(t.due);
+    toast({
+      title: 'Reminder: ' + t.title, msg: body, sticky: true, task: t.id,
+      actions: [{ id: 'done', label: 'Mark done' }, { id: 'dismiss', label: 'Dismiss' }]
+    });
+    beep();
+    systemNotify(t, body);
+  }
+
+  /* ---------- task actions ---------- */
+  function toggle(id) {
+    var t = find(id);
+    if (!t) return;
+    var now = Date.now();
+    if (!t.done) {
+      t.done = true; t.doneAt = now;
+      if (t.repeat !== 'none' && !t.nextId) {
+        var n = nextDue(t.due, t.repeat), g = 0;
+        while (n <= now && g++ < 400) n = nextDue(n, t.repeat);
+        var nt = mk({ title: t.title, due: n, pri: t.pri, lead: t.lead, repeat: t.repeat });
+        state.tasks.push(nt);
+        t.nextId = nt.id;
+        toast({ title: 'Done. Next one is scheduled', msg: dueLabel(n) });
+      }
+    } else {
+      t.done = false; t.doneAt = null;
+      if (t.nextId) {
+        var nx = find(t.nextId);
+        if (nx && !nx.done) state.tasks = state.tasks.filter(function (x) { return x.id !== nx.id; });
+        t.nextId = null;
+      }
+      t.notified = t.due - t.lead * MIN <= now;
+    }
+    var tt = document.querySelector('.toast[data-task="' + id + '"]');
+    if (tt) tt.remove();
+    save(); render();
+  }
+  function removeTask(id) {
+    state.tasks = state.tasks.filter(function (t) { return t.id !== id; });
+    if (state.editing === id) resetForm();
+    save(); render();
+  }
+
+  /* ---------- form ---------- */
+  function radio(name, val) {
+    var r = document.querySelector('input[name="' + name + '"][value="' + val + '"]');
+    if (r) r.checked = true;
+  }
+  function radioVal(name) { return document.querySelector('input[name="' + name + '"]:checked').value; }
+  function setForm(t) {
+    $('f-title').value = t ? t.title : '';
+    $('f-due').value = toLocal(t ? t.due : defaultDue());
+    $('f-repeat').value = t ? t.repeat : 'none';
+    radio('pri', t ? t.pri : 'med');
+    radio('lead', t ? String(t.lead) : '60');
+    $('formtitle').textContent = t ? 'Edit task' : 'New task';
+    $('f-submit').textContent = t ? 'Save changes' : 'Add task';
+    $('f-cancel').hidden = !t;
+    $('ferr').textContent = '';
+  }
+  function resetForm() { state.editing = null; setForm(null); }
+
+  function onSubmit(e) {
+    e.preventDefault();
+    var title = $('f-title').value.trim();
+    var due = new Date($('f-due').value).getTime();
+    if (!title) { $('ferr').textContent = 'Give the task a name.'; $('f-title').focus(); return; }
+    if (!isFinite(due)) { $('ferr').textContent = 'Pick a due date and time.'; $('f-due').focus(); return; }
+    var data = {
+      title: title, due: due, pri: radioVal('pri'), lead: parseInt(radioVal('lead'), 10), repeat: $('f-repeat').value
+    };
+    if (state.editing) {
+      var t = find(state.editing);
+      if (t) {
+        var timeChanged = t.due !== data.due || t.lead !== data.lead;
+        Object.assign(t, data);
+        if (timeChanged) t.notified = false;
+        toast({ title: 'Changes saved', msg: t.title });
+      }
+    } else {
+      var nt = mk(data);
+      state.tasks.push(nt);
+      state.flash = nt.id;
+      toast({ title: 'Task added', msg: dueLabel(nt.due) });
+      setTimeout(function () { if (state.flash === nt.id) { state.flash = null; renderList(); } }, 2500);
+    }
+    save();
+    resetForm();
+    state.filter = state.filter === 'done' ? 'all' : state.filter;
+    render();
+    tick();
+  }
+
+  /* ---------- rendering: list ---------- */
+  function itemHTML(t, now) {
+    var overdue = !t.done && t.due < now;
+    var p = PRI[t.pri] || PRI.med;
+    var relTxt = t.done ? (t.doneAt ? 'done ' + rel(t.doneAt) : 'done') : rel(t.due);
+    var tags = '<span class="tag pri" style="--p:var(' + p.v + ')">' + p.label + '</span>';
+    if (t.repeat !== 'none') tags += '<span class="tag">repeats ' + t.repeat + '</span>';
+    if (!t.done) tags += '<span class="tag">' + (t.notified ? 'reminded' : leadLabel(t.lead)) + '</span>';
+    if (t.sample) tags += '<span class="tag">sample</span>';
+    var sure = state.confirmDel === t.id;
+    return '<li class="task' + (t.done ? ' is-done' : '') + (overdue ? ' is-overdue' : '') + (state.flash === t.id ? ' is-flash' : '') + '" data-id="' + t.id + '">' +
+      '<button type="button" class="check" data-act="toggle" style="--p:var(' + p.v + ')" aria-pressed="' + t.done + '" aria-label="' + (t.done ? 'Mark as pending: ' : 'Mark as done: ') + esc(t.title) + '">' +
+      '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
+      '<div class="tbody"><p class="ttitle">' + esc(t.title) + '</p>' +
+      '<p class="tmeta"><span class="when">' + esc(dueLabel(t.due)) + '</span><span class="rel" data-rel="' + t.due + '" data-done="' + (t.done ? 1 : 0) + '">' + esc(relTxt) + '</span>' + tags + '</p></div>' +
+      '<div class="tact"><button type="button" class="link" data-act="edit">Edit</button>' +
+      '<button type="button" class="link danger' + (sure ? ' sure' : '') + '" data-act="del">' + (sure ? 'Confirm delete' : 'Delete') + '</button></div></li>';
+  }
+  function overdueSig(now) {
+    return dayStart(now) + '|' + state.tasks.filter(function (t) { return !t.done && t.due < now; }).map(function (t) { return t.id; }).join(',');
+  }
+  function renderList() {
+    var now = Date.now(), ds = dayStart(now), de = ds + DAY, q = state.q.toLowerCase();
+    var G = { overdue: [], today: [], later: [], done: [] };
+    state.tasks.forEach(function (t) {
+      if (q && t.title.toLowerCase().indexOf(q) === -1) return;
+      if (t.done) G.done.push(t);
+      else if (t.due < now) G.overdue.push(t);
+      else if (t.due < de) G.today.push(t);
+      else G.later.push(t);
+    });
+    ['overdue', 'today', 'later'].forEach(function (k) { G[k].sort(function (a, b) { return a.due - b.due; }); });
+    G.done.sort(function (a, b) { return (b.doneAt || 0) - (a.doneAt || 0); });
+    var titles = { overdue: 'Overdue', today: 'Today', later: 'Upcoming', done: 'Completed' };
+    var show = { all: ['overdue', 'today', 'later', 'done'], pending: ['overdue', 'today', 'later'], overdue: ['overdue'], done: ['done'] }[state.filter];
+    var html = '';
+    show.forEach(function (k) {
+      if (!G[k].length) return;
+      html += '<section class="group ' + k + '"><h3>' + titles[k] + ' <span>' + G[k].length + '</span></h3><ul class="tasks">' +
+        G[k].map(function (t) { return itemHTML(t, now); }).join('') + '</ul></section>';
+    });
+    if (!html) {
+      var msg = q ? 'No tasks match that search.' :
+        state.filter === 'done' ? 'Nothing completed yet.' :
+        state.filter === 'overdue' ? 'Nothing overdue. Nice.' :
+        'No tasks yet. Add your first one above.';
+      html = '<p class="empty">' + msg + '</p>';
+    }
+    $('list').innerHTML = html;
+    var all = state.tasks, nowt = now;
+    $('c-all').textContent = all.length;
+    $('c-pending').textContent = all.filter(function (t) { return !t.done; }).length;
+    $('c-overdue').textContent = all.filter(function (t) { return !t.done && t.due < nowt; }).length;
+    $('c-done').textContent = all.filter(function (t) { return t.done; }).length;
+    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) {
+      c.setAttribute('aria-pressed', String(c.dataset.f === state.filter));
+    });
+    state.sig = overdueSig(now);
+  }
+
+  /* ---------- rendering: dashboard ---------- */
+  function renderDash() {
+    var now = Date.now(), ds = dayStart(now), de = ds + DAY;
+    var pend = state.tasks.filter(function (t) { return !t.done; });
+    var done = state.tasks.length - pend.length;
+    var over = pend.filter(function (t) { return t.due < now; }).length;
+    var today = pend.filter(function (t) { return t.due >= ds && t.due < de; }).length;
+    var total = state.tasks.length;
+    var rate = total ? Math.round(done / total * 100) : 0;
+    $('s-done').textContent = done;
+    $('s-pending').textContent = pend.length;
+    $('s-today').textContent = today;
+    $('s-over').textContent = over;
+    $('s-over-wrap').className = 'stat' + (over ? ' warn' : '');
+    $('rate').textContent = rate + '%';
+    var circ = 2 * Math.PI * 36;
+    $('ring').style.strokeDasharray = circ.toFixed(2);
+    $('ring').style.strokeDashoffset = (circ * (1 - rate / 100)).toFixed(2);
+    var counts = { high: 0, med: 0, low: 0 };
+    pend.forEach(function (t) { if (counts[t.pri] !== undefined) counts[t.pri]++; });
+    var split = '', legend = '';
+    ['high', 'med', 'low'].forEach(function (k) {
+      if (counts[k]) split += '<i style="width:' + (counts[k] / pend.length * 100) + '%;background:var(' + PRI[k].v + ')"></i>';
+      legend += '<span style="--c:var(' + PRI[k].v + ')">' + PRI[k].label + ' ' + counts[k] + '</span>';
+    });
+    $('split').innerHTML = split;
+    $('legend').innerHTML = legend;
+  }
+
+  /* ---------- rendering: dial ---------- */
+  function ang(ms, ds) { return (ms - ds) / DAY * 360 - 90; }
+  function pt(r, deg) { var a = deg * Math.PI / 180; return [C + r * Math.cos(a), C + r * Math.sin(a)]; }
+  function arc(r, a0, a1) {
+    var p0 = pt(r, a0), p1 = pt(r, Math.max(a1, a0 + 0.05));
+    return 'M' + p0[0].toFixed(2) + ' ' + p0[1].toFixed(2) + 'A' + r + ' ' + r + ' 0 ' + ((a1 - a0) > 180 ? 1 : 0) + ' 1 ' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2);
+  }
+  function wrap(text, max, lines) {
+    var words = text.split(/\s+/), out = [], cur = '', i;
+    for (i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (w.length > max) w = w.slice(0, max - 1) + '…';
+      if ((cur ? cur + ' ' : '').length + w.length <= max) cur = cur ? cur + ' ' + w : w;
+      else { out.push(cur); cur = w; }
+      if (out.length === lines) break;
+    }
+    if (out.length < lines && cur) out.push(cur);
+    if (out.length === lines && i < words.length - 1) {
+      var last = out[lines - 1];
+      out[lines - 1] = (last.length > max - 1 ? last.slice(0, max - 1) : last) + '…';
+    }
+    return out.slice(0, lines);
+  }
+  function renderDial() {
+    var now = Date.now(), ds = dayStart(now), de = ds + DAY, nowA = ang(now, ds), h, s = '';
+    s += '<circle cx="' + C + '" cy="' + C + '" r="' + RING_R + '" class="d-track"/>';
+    s += '<path d="' + arc(RING_R, -90, nowA) + '" class="d-elapsed"/>';
+    for (h = 0; h < 24; h++) {
+      var major = h % 6 === 0, a = h * 15 - 90;
+      var p0 = pt(134, a), p1 = pt(major ? 146 : 140, a);
+      s += '<line class="d-tick' + (major ? ' major' : '') + '" x1="' + p0[0].toFixed(1) + '" y1="' + p0[1].toFixed(1) + '" x2="' + p1[0].toFixed(1) + '" y2="' + p1[1].toFixed(1) + '"/>';
+      if (major) { var lp = pt(158, a); s += '<text class="d-lbl" x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" dy=".35em">' + pad(h) + '</text>'; }
+    }
+    var todays = state.tasks.filter(function (t) { return t.due >= ds && t.due < de; });
+    var pendToday = todays.filter(function (t) { return !t.done; });
+    pendToday.forEach(function (t) {
+      var a0 = ang(Math.max(t.due - t.lead * MIN, ds), ds), a1 = ang(t.due, ds);
+      s += '<path class="d-win" style="stroke:var(' + (PRI[t.pri] || PRI.med).v + ')" d="' + arc(RING_R, a0, a1) + '"/>';
+    });
+    todays.forEach(function (t) {
+      var p = pt(RING_R, ang(t.due, ds)), col = 'var(' + (PRI[t.pri] || PRI.med).v + ')';
+      var label = (t.done ? 'Done: ' : '') + t.title + ', ' + fmtTime.format(t.due);
+      s += '<g class="d-dot" tabindex="0" role="button" data-id="' + t.id + '" aria-label="' + esc(label) + '" transform="translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')"><title>' + esc(label) + '</title>' +
+        '<circle class="hit" r="15"/><circle class="ring" r="12"/>' +
+        (t.done ? '<circle r="5" fill="none" stroke="var(--muted)" stroke-width="2"/>' : '<circle r="8" fill="' + col + '" stroke="var(--surface)" stroke-width="3"/>') + '</g>';
+    });
+    var n0 = pt(104, nowA), n1 = pt(134, nowA);
+    s += '<line class="d-needle" x1="' + n0[0].toFixed(1) + '" y1="' + n0[1].toFixed(1) + '" x2="' + n1[0].toFixed(1) + '" y2="' + n1[1].toFixed(1) + '"/>';
+    s += '<circle class="d-needle-dot" cx="' + n0[0].toFixed(1) + '" cy="' + n0[1].toFixed(1) + '" r="3.5"/>';
+
+    var pend = state.tasks.filter(function (t) { return !t.done; }).sort(function (a, b) { return a.due - b.due; });
+    var next = pend.filter(function (t) { return t.due >= now; })[0];
+    var overN = pend.filter(function (t) { return t.due < now; }).length;
+    var k, lines, r1, r2;
+    if (next) { k = 'NEXT UP'; lines = wrap(next.title, 16, 2); r1 = rel(next.due); r2 = dueLabel(next.due); }
+    else if (overN) { k = 'OVERDUE'; lines = [overN + (overN === 1 ? ' task' : ' tasks')]; r1 = 'needs attention'; r2 = ''; }
+    else { k = 'ALL CLEAR'; lines = ['Nothing pending']; r1 = 'add a task below'; r2 = ''; }
+    var ty = lines.length === 2 ? 156 : 166;
+    s += '<text class="d-k" x="' + C + '" y="126">' + k + '</text>';
+    lines.forEach(function (ln, i) { s += '<text class="d-t" x="' + C + '" y="' + (ty + i * 22) + '">' + esc(ln) + '</text>'; });
+    s += '<text class="d-r" x="' + C + '" y="' + (ty + lines.length * 22 + 8) + '">' + esc(r1) + '</text>';
+    if (r2) s += '<text class="d-s" x="' + C + '" y="' + (ty + lines.length * 22 + 28) + '">' + esc(r2) + '</text>';
+    var dial = $('dial');
+    dial.innerHTML = s;
+    dial.setAttribute('aria-label', "Today's tasks on a 24-hour dial. " + pendToday.length + ' pending due today.');
+    $('clock').textContent = pad(new Date(now).getHours()) + ':' + pad(new Date(now).getMinutes()) + ' · ' +
+      new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).format(now);
+  }
+
+  function renderSample() { $('samplebar').hidden = !state.tasks.some(function (t) { return t.sample; }); }
+  function render() { renderList(); renderDash(); renderDial(); renderSample(); }
+
+  /* ---------- clock tick ---------- */
+  function tick() {
+    var now = Date.now(), fired = false;
+    state.tasks.forEach(function (t) {
+      if (!t.done && !t.notified && now >= t.due - t.lead * MIN) { t.notified = true; fired = true; remind(t); }
+    });
+    if (fired) save();
+    Array.prototype.forEach.call(document.querySelectorAll('[data-rel]'), function (el) {
+      if (el.dataset.done === '0') el.textContent = rel(parseInt(el.dataset.rel, 10));
+    });
+    if (fired || overdueSig(now) !== state.sig) renderList();
+    renderDial();
+    renderDash();
+  }
+
+  /* ---------- events ---------- */
+  function focusTask(id) {
+    var t = find(id);
+    if (!t) return;
+    var q = state.q.toLowerCase();
+    if (q && t.title.toLowerCase().indexOf(q) === -1) { state.q = ''; $('q').value = ''; }
+    if (state.filter === 'done' || (state.filter === 'overdue' && t.due >= Date.now())) state.filter = 'all';
+    state.flash = id;
+    renderList();
+    var el = document.querySelector('.task[data-id="' + id + '"]');
+    if (el) el.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    setTimeout(function () { if (state.flash === id) { state.flash = null; renderList(); } }, 2500);
+  }
+
+  function init() {
+    var th = read(THEME);
+    if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th);
+    themeLabel();
+    if (!load()) seed();
+    setForm(null);
+    render();
+    alertsLabel();
+    updateNet();
+    tick();
+    setInterval(tick, 15000);
+
+    document.addEventListener('pointerdown', ensureAudio, { once: true });
+    document.addEventListener('keydown', ensureAudio, { once: true });
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+    window.addEventListener('online', updateNet);
+    window.addEventListener('offline', updateNet);
+
+    $('theme').addEventListener('click', function () {
+      var next = effTheme() === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      store(THEME, next);
+      themeLabel();
+    });
+    $('alerts').addEventListener('click', function () {
+      try {
+        var r = Notification.requestPermission(function () {});
+        Promise.resolve(r).then(function () {
+          alertsLabel();
+          if (Notification.permission !== 'granted') toast({ title: 'System alerts are off', msg: 'This browser did not allow them. Reminders still appear on this page.', ms: 4500 });
+        });
+      } catch (e) { toast({ title: 'System alerts are unavailable', msg: 'Reminders still appear on this page.', ms: 4500 }); }
+    });
+    $('clearsamples').addEventListener('click', function () {
+      state.tasks = state.tasks.filter(function (t) { return !t.sample; });
+      if (state.editing && !find(state.editing)) resetForm();
+      save(); render();
+    });
+    $('taskform').addEventListener('submit', onSubmit);
+    $('f-cancel').addEventListener('click', resetForm);
+    $('chips').addEventListener('click', function (e) {
+      var c = e.target.closest('.chip');
+      if (!c) return;
+      state.filter = c.dataset.f;
+      renderList();
+    });
+    $('q').addEventListener('input', function (e) { state.q = e.target.value.trim(); renderList(); });
+
+    $('list').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]');
+      if (!b) return;
+      var li = b.closest('.task'), id = li.dataset.id, act = b.dataset.act;
+      if (act === 'toggle') toggle(id);
+      else if (act === 'edit') {
+        var t = find(id);
+        if (!t) return;
+        state.editing = id;
+        setForm(t);
+        $('taskform').scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        $('f-title').focus();
+      } else if (act === 'del') {
+        if (state.confirmDel === id) { state.confirmDel = null; removeTask(id); }
+        else {
+          state.confirmDel = id; renderList();
+          setTimeout(function () { if (state.confirmDel === id) { state.confirmDel = null; renderList(); } }, 3000);
+        }
+      }
+    });
+    $('dial').addEventListener('click', function (e) {
+      var g = e.target.closest('.d-dot');
+      if (g) focusTask(g.dataset.id);
+    });
+    $('dial').addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var g = e.target.closest ? e.target.closest('.d-dot') : null;
+      if (g) { e.preventDefault(); focusTask(g.dataset.id); }
+    });
+    $('toasts').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-tact]');
+      if (!b) return;
+      var el = b.closest('.toast');
+      if (b.dataset.tact === 'done' && el.dataset.task) toggle(el.dataset.task);
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+  function updateNet() {
+    var on = navigator.onLine !== false, n = $('net');
+    n.textContent = on ? 'Online' : 'Offline · saved on device';
+    n.className = 'pill' + (on ? '' : ' off');
+  }
+  init();
+})();
+</script>
+
+</body></html>
